@@ -182,11 +182,11 @@ def train(fcn):
             保存目录为根文件夹
             '''
             if i%5==0:
-                if choice==8:
+                if choice=='8':
                     torch.save(fcn.state_dict(),"FCN8{}.pth".format(i))
-                elif choice==16:
+                elif choice=='16':
                     torch.save(fcn.state_dict(), "FCN16{}.pth".format(i))
-                elif choice==32:
+                elif choice=='32':
                     torch.save(fcn.state_dict(), "FCN32{}.pth".format(i))
 
         print("loss:",train_loss_epoch)
