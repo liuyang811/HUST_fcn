@@ -2,107 +2,87 @@
 视觉认知工程第三题fcn网络pytorch实现
 
 <p align="center">
-  <img src="horse.png" width="350" title="Original Image"/>
-  <img src="matte.png" width="350" title="IndexNet Matting"/>
+  <img src="picture/horse001.png" width="350" title="原始数据"/>
 </p>
 
-This repository includes the official implementation of IndexNet Matting for deep image matting, presented in our paper:
 
-**[Indices Matter: Learning to Index for Deep Image Matting](https://arxiv.org/abs/1908.00672)**
+## 1.更新
+- 17 August 2022: 上传仓库 
 
-Proc. IEEE/CVF International Conference on Computer Vision (ICCV), 2019
+## 2.介绍
+本项目对应华中科技大学人工智能与自动化学院视觉认知工程课程设计第三题设计
 
-[Hao Lu](https://sites.google.com/site/poppinace/)<sup>1</sup>, Yutong Dai<sup>1</sup>, [Chunhua Shen](http://cs.adelaide.edu.au/~chhshen/)<sup>1</sup>, Songcen Xu<sup>2</sup>
+选择FCN网络，从零开始搭建了FCN32s，FCN16s，FCN8s三个网络，并在visdom上进行可视化，
+在所给数据集上汇报了mIOU等指标
 
-<sup>1</sup>The University of Adelaide, Australia
+## 3.包含文件
 
-<sup>2</sup>Noah's Ark Lab, Huawei Technologies
+### 3.1 [train.py](train.py)
+* 数据的读取与预处理
+* 模型训练与测试
+* 主函数
 
-## Updates
-- 8 June 2020: The [journal version](https://arxiv.org/abs/1908.09895v2) of this work has been accepted to TPAMI! We further report many interesting results on other dense prediction tasks and extend our insights on generic upsampling operators.
-- 4 April 2020: Training code is released!
-- 16 Aug 2019: The supplementary material is finalized and released!
-- 5 Aug 2019: Inference code of IndexNet Matting is released!
+### 3.2 [FCN32.py](FCN32.py)
+* FCN32s模型搭建
 
+### 3.3 [FCN16.py](FCN16.py)
+* FCN16s模型搭建
 
-## Highlights
-- **Simple and effective:** IndexNet Matting only deals with the upsampling stage but exhibits at least 16.1% relative improvements, compared to the Deep Matting baseline;
-- **Memory-efficient:** IndexNet Matting builds upon MobileNetV2. It can process an image with a resolution up to 1980x1080 on a single GTX 1070;
-- **Easy to use:** This framework also includes our re-implementation of Deep Matting and the pretrained model presented in the Adobe's CVPR17 paper.
+### 3.4 [FCN8.py](FCN8.py)
+* FCN8s模型搭建
 
-## Installation
-Our code has been tested on Python 3.6.8/3.7.2 and PyTorch 0.4.1/1.1.0. Please follow the official instructions to configure your environment. See other required packages in `requirements.txt`.
-
-## A Quick Demo
-We have included our pretrained model in `./pretrained` and several images and trimaps from the Adobe Image Dataset in `./examples`. Run the following command for a quick demonstration of IndexNet Matting. The inferred alpha mattes are in the folder `./examples/mattes`.
-
-    python scripts/demo.py
+### 3.5 [mIOU.py](mIOU.py)
+* mIOU指标
     
-## Prepare Your Data
-1. Please contact Brian Price (bprice@adobe.com) requesting for the Adobe Image Matting dataset;
-2. Composite the dataset using provided foreground images, alpha mattes, and background images from the COCO and Pascal VOC datasets. I slightly modified the provided `compositon_code.py` to improve the efficiency, included in the `scripts` folder. Note that, since the image resolution is quite high, the dataset will be over 100 GB after composition.
-3. The final path structure used in my code looks like this:
-
-````
-$PATH_TO_DATASET/Combined_Dataset
-├──── Training_set
-│    ├──── alpha (431 images)
-│    ├──── fg (431 images)
-│    └──── merged (43100 images)
-├──── Test_set
-│    ├──── alpha (50 images)
-│    ├──── fg (50 images)
-│    ├──── merged (1000 images)
-│    └──── trimaps (1000 images)
+## 4.准备数据
+将数据放入weizmann_horse_db文件夹使其具有以下格式
 ````
 
-## Inference
-Run the following command to do inference of IndexNet Matting/Deep Matting on the Adobe Image Matting dataset:
+├──── weizmann_horse_db
+│    ├──── horse (327 images)
+│    └──── mask (327 images)
 
-    python scripts/demo_indexnet_matting.py
+数据获取方式：https://www.kaggle.com/datasets/ztaihong/weizmann-horse-database/metadata
+````
     
-    python scripts/demo_deep_matting.py
-    
-Please note that:
-- `DATA_DIR` should be modified to your dataset directory;
-- Images used in Deep Matting has been downsampled by 1/2 to enable the GPU inference. To reproduce the full-resolution results, the inference can be executed on CPU, which takes about 2 days.
+## 5.运行指南
+### 5.1运行环境
+* 编程语言：Python：3.6
+* 使用框架：pytorch
+* 可视化工具选择：visdom
 
-Here is the results of IndexNet Matting and our reproduced results of Deep Matting on the Adobe Image Dataset:
+对应库版本：
+* torch 1.2.0
+* numpy 1.17.0
+* torchvision 0.4.0 
+* visdom 0.1.8.9
 
-| Methods | Remark | #Param. | GFLOPs | SAD | MSE | Grad | Conn | Model |
-| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| Deep Matting | Paper | -- | -- | 54.6 | 0.017 | 36.7 | 55.3 | -- |
-| Deep Matting | Re-implementation | 130.55M | 32.34 | 55.8 | 0.018 | 34.6 | 56.8 | [Google Drive (522MB)](https://drive.google.com/open?id=1Uws86AGkFqV2S7XkNuR8dz5SOttxh7AY) |
-| IndexNet Matting | Ours | 8.15M | 6.30 | 45.8 | 0.013 | 25.9 | 43.7 | Included |
+### 5.2程序运行
+直接运行train.py文件进行训练与测试
+然后对模型进行选择（输入对应选择参数）
+<p align="center">
+  <img src="picture/运行.png" width="350" title="运行图片"/>
+</p>
 
-* The original paper reported that there were 491 images, but the released dataset only includes 431 images. Among missing images, 38 of them were said double counted, and the other 24 of them were not released. As a result, we at least use 4.87% fewer training data than the original paper. Thus, the small differerce in performance should be normal.
-* The evaluation code (Matlab code implemented by the Deep Image Matting's author) placed in the ``./evaluation_code`` folder is used to report the final performance for a fair comparion. We have also implemented a python version. The numerial difference is subtle.
+### 5.3可视化
+需打开命令行并进入编译环境
+输入如下代码 python -m visdom.server
+获取远程主机连接，若连接成功，则会返回如下信息
+<p align="center">
+  <img src="picture/命令行操作.png" width="350" title="运行图片"/>
+</p>
 
-## Training
-Run the following command to train IndexNet Matting:
+在运行≥1个epoch后，会出现visdom的可视化界面入口
+<p align="center">
+  <img src="picture/可视化界面入口.png" width="350" title="运行图片"/>
+</p>
 
-    sh train.sh
-    
-- `--data-dir` should be modified to your dataset directory.
-- I was able to train the model on a single GTX 1080ti (12 GB). The training takes about 5 days. The current bottleneck appears to be the dataloader.
+### 5.4运行结果
+#### 5.4.1
+pycharm 输出端，可查看训练集与测试集上的loss，mIOU等指标
 
-## Citation
-If you find this work or code useful for your research, please cite:
-```
-@inproceedings{hao2019indexnet,
-  title={Indices Matter: Learning to Index for Deep Image Matting},
-  author={Lu, Hao and Dai, Yutong and Shen, Chunhua and Xu, Songcen},
-  booktitle={Proc. IEEE/CVF International Conference on Computer Vision (ICCV)},
-  year={2019}
-}
-
-@article{hao2020indexnet,
-  title={Index Networks},
-  author={Lu, Hao and Dai, Yutong and Shen, Chunhua and Xu, Songcen},
-  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence},
-  year={2020}
-}
-```
-
-## Permission and Disclaimer
-This code is only for non-commercial purposes. As covered by the ADOBE IMAGE DATASET LICENSE AGREEMENT, the trained models included in this repository can only be used/distributed for non-commercial purposes. Anyone who violates this rule will be at his/her own risk.
+#### 5.4.2
+visdom 可视化界面，可查看loss 随epoch的变化曲线，以及预测结果与mask的比较
+<p align="center">
+  <img src="picture/FCN16.png" width="350" title="运行图片"/>
+</p>
